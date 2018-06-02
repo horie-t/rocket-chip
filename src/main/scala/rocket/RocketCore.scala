@@ -106,6 +106,8 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
       ("L2 TLB miss", () => io.ptw.perf.l2miss)))))
 
   val pipelinedMul = usingMulDiv && mulDivParams.mulUnroll == xLen
+
+  // 命令のビットパターンと、内部処理用のコードの対応定義
   val decode_table = {
     (if (usingMulDiv) new MDecode(pipelinedMul) +: (xLen > 32).option(new M64Decode(pipelinedMul)).toSeq else Nil) ++:
     (if (usingAtomics) new ADecode +: (xLen > 32).option(new A64Decode).toSeq else Nil) ++:
@@ -122,6 +124,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val mem_ctrl = Reg(new IntCtrlSigs)
   val wb_ctrl = Reg(new IntCtrlSigs)
 
+  // 実行ステージ用レジスタ?
   val ex_reg_xcpt_interrupt  = Reg(Bool())
   val ex_reg_valid           = Reg(Bool())
   val ex_reg_rvc             = Reg(Bool())
@@ -135,6 +138,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val ex_reg_inst = Reg(Bits())
   val ex_reg_raw_inst = Reg(UInt())
 
+  // メモリ書き込みステージ用レジスタ?
   val mem_reg_xcpt_interrupt  = Reg(Bool())
   val mem_reg_valid           = Reg(Bool())
   val mem_reg_rvc             = Reg(Bool())
@@ -155,6 +159,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val mem_br_taken = Reg(Bool())
   val take_pc_mem = Wire(Bool())
 
+  // レジスタ書き戻しステージ用レジスタ?
   val wb_reg_valid           = Reg(Bool())
   val wb_reg_xcpt            = Reg(Bool())
   val wb_reg_replay          = Reg(Bool())
@@ -172,6 +177,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val take_pc = take_pc_mem_wb
 
   // decode stage
+  /*****************************************
+   * デコードステージ 
+   *****************************************/
   val ibuf = Module(new IBuf)
   val id_expanded_inst = ibuf.io.inst.map(_.bits.inst)
   val id_raw_inst = ibuf.io.inst.map(_.bits.raw)
@@ -189,6 +197,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val id_reg_fence = Reg(init=Bool(false))
   val id_ren = IndexedSeq(id_ctrl.rxs1, id_ctrl.rxs2)
   val id_raddr = IndexedSeq(id_raddr1, id_raddr2)
+  // レジスタ・ファイル
   val rf = new RegFile(31, xLen)
   val id_rs = id_raddr.map(rf.read _)
   val ctrl_killd = Wire(Bool())
@@ -267,6 +276,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val id_bypass_src = id_raddr.map(raddr => bypass_sources.map(s => s._1 && s._2 === raddr))
 
   // execute stage
+  /*****************************************
+   * 実行ステージ
+   *****************************************/
   val bypass_mux = bypass_sources.map(_._3)
   val ex_reg_rs_bypass = Reg(Vec(id_raddr.size, Bool()))
   val ex_reg_rs_lsb = Reg(Vec(id_raddr.size, UInt(width = log2Ceil(bypass_sources.size))))
@@ -282,6 +294,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
     A2_IMM -> ex_imm,
     A2_SIZE -> Mux(ex_reg_rvc, SInt(2), SInt(4))))
 
+  // 演算装置
   val alu = Module(new ALU)
   alu.io.dw := ex_ctrl.alu_dw
   alu.io.fn := ex_ctrl.alu_fn
@@ -289,6 +302,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   alu.io.in1 := ex_op1.asUInt
 
   // multiplier and divider
+  // 乗算・除算装置
   val div = Module(new MulDiv(if (pipelinedMul) mulDivParams.copy(mulUnroll = 0) else mulDivParams, width = xLen))
   div.io.req.valid := ex_reg_valid && ex_ctrl.div
   div.io.req.bits.dw := ex_ctrl.alu_dw
@@ -378,6 +392,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   coverExceptions(ex_xcpt, ex_cause, "EXECUTE", exCoverCauses)
 
   // memory stage
+  /*****************************************
+   * メモリアクセスステージ
+   *****************************************/
   val mem_pc_valid = mem_reg_valid || mem_reg_replay || mem_reg_xcpt_interrupt
   val mem_br_target = mem_reg_pc.asSInt +
     Mux(mem_ctrl.branch && mem_br_taken, ImmGen(IMM_SB, mem_reg_inst),
@@ -458,6 +475,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val ctrl_killm = killm_common || mem_xcpt || fpu_kill_mem
 
   // writeback stage
+  /*
+   * レジスタ書き戻しステージ
+   */
   wb_reg_valid := !ctrl_killm
   wb_reg_replay := replay_mem && !take_pc_wb
   wb_reg_xcpt := mem_xcpt && !take_pc_wb
@@ -630,8 +650,12 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
     csr.io.csr_stall
   ctrl_killd := !ibuf.io.inst(0).valid || ibuf.io.inst(0).bits.replay || take_pc_mem_wb || ctrl_stalld || csr.io.interrupt
 
+  /*
+   * 命令メモリアクセス関連
+   */
   io.imem.req.valid := take_pc
   io.imem.req.bits.speculative := !take_pc_wb
+  // PCの更新
   io.imem.req.bits.pc :=
     Mux(wb_xcpt || csr.io.eret, csr.io.evec, // exception or [m|s]ret
     Mux(replay_wb,              wb_reg_pc,   // replay
@@ -779,6 +803,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   }
 }
 
+/**
+  * レジスタファイル
+  */
 class RegFile(n: Int, w: Int, zero: Boolean = false) {
   private val rf = Mem(n, UInt(width = w))
   private def access(addr: UInt) = rf(~addr(log2Up(n)-1,0))

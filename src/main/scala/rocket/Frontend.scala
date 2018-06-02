@@ -16,7 +16,7 @@ import freechips.rocketchip.util.property._
 import chisel3.internal.sourceinfo.SourceInfo
 
 class FrontendReq(implicit p: Parameters) extends CoreBundle()(p) {
-  val pc = UInt(width = vaddrBitsExtended)
+  val pc = UInt(width = vaddrBitsExtended) // プログラム・カウンタ
   val speculative = Bool()
 }
 
@@ -43,6 +43,9 @@ class FrontendPerfEvents extends Bundle {
   val tlbMiss = Bool()
 }
 
+/**
+  * 命令メモリ読み込み用I/O?
+  */
 class FrontendIO(implicit p: Parameters) extends CoreBundle()(p) {
   val req = Valid(new FrontendReq)
   val sfence = Valid(new SFenceReq)
@@ -82,9 +85,11 @@ class FrontendModule(outer: Frontend) extends LazyModuleImp(outer)
 
   val s0_valid = io.cpu.req.valid || !fq.io.mask(fq.io.mask.getWidth-3)
   val s1_valid = RegNext(s0_valid)
+  // Stage1 プログラム・カウンタ
   val s1_pc = Reg(UInt(width=vaddrBitsExtended))
   val s1_speculative = Reg(Bool())
   val s2_valid = RegInit(false.B)
+  // Stage2 プログラム・カウンタ
   val s2_pc = RegInit(t = UInt(width = vaddrBitsExtended), alignPC(io.reset_vector))
   val s2_btb_resp_valid = if (usingBTB) Reg(Bool()) else false.B
   val s2_btb_resp_bits = Reg(new BTBResp)
