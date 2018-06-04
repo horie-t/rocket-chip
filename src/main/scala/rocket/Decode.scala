@@ -5,6 +5,9 @@ package freechips.rocketchip.rocket
 import Chisel._
 import scala.collection.mutable.{ArrayBuffer, Map, Set}
 
+/**
+  * RISV-Vの機械語のビットパターンを内部表現にデコード
+  */
 object DecodeLogic
 {
   def term(lit: BitPat) =

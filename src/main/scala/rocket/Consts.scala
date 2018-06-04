@@ -63,6 +63,7 @@ trait ScalarOpConstants {
 trait MemoryOpConstants {
   val NUM_XA_OPS = 9
   val M_SZ      = 5
+  // 
   def M_X       = BitPat("b?????");
   def M_XRD     = UInt("b00000"); // int load
   def M_XWR     = UInt("b00001"); // int store

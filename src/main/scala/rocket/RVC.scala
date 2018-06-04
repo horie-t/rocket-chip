@@ -8,14 +8,24 @@ import freechips.rocketchip.config.Parameters
 import freechips.rocketchip.tile._
 import freechips.rocketchip.util._
 
+/** 展開済み命令コード
+  */
 class ExpandedInstruction extends Bundle {
+  /** 命令コード */
   val bits = UInt(width = 32)
+  /** 宛先レジスタ */
   val rd = UInt(width = 5)
+  /** 元レジスタ1 */
   val rs1 = UInt(width = 5)
+  /** 元レジスタ2 */
   val rs2 = UInt(width = 5)
+  /** 元レジスタ3(浮動小数点積和演算用)  */
   val rs3 = UInt(width = 5)
 }
 
+/** RISC-V 命令コード用デコーダ
+  * @param x 命令コード
+  */
 class RVCDecoder(x: UInt)(implicit p: Parameters) {
   def inst(bits: UInt, rd: UInt = x(11,7), rs1: UInt = x(19,15), rs2: UInt = x(24,20), rs3: UInt = x(31,27)) = {
     val res = Wire(new ExpandedInstruction)
@@ -29,7 +39,7 @@ class RVCDecoder(x: UInt)(implicit p: Parameters) {
 
   def rs1p = Cat(UInt(1,2), x(9,7))
   def rs2p = Cat(UInt(1,2), x(4,2))
-  def rs2 = x(6,2)
+  def rs2 = x(6,2) // 32ビット命令のopcodeの実体
   def rd = x(11,7)
   def addi4spnImm = Cat(x(10,7), x(12,11), x(5), x(6), UInt(0,2))
   def lwImm = Cat(x(5), x(12,10), x(6), UInt(0,2))
@@ -44,9 +54,9 @@ class RVCDecoder(x: UInt)(implicit p: Parameters) {
   def jImm = Cat(Fill(10, x(12)), x(8), x(10,9), x(6), x(7), x(2), x(11), x(5,3), UInt(0,1))
   def bImm = Cat(Fill(5, x(12)), x(6,5), x(2), x(11,10), x(4,3), UInt(0,1))
   def shamt = Cat(x(12), x(6,2))
-  def x0 = UInt(0,5)
-  def ra = UInt(1,5)
-  def sp = UInt(2,5)
+  def x0 = UInt(0,5) // zeroレジスタ番号
+  def ra = UInt(1,5) // 戻りアドレスレジスタ番号
+  def sp = UInt(2,5) // スタック・ポインタレジスタ番号
 
   def q0 = {
     def addi4spn = {
@@ -151,6 +161,8 @@ class RVCDecoder(x: UInt)(implicit p: Parameters) {
   }
 }
 
+/** 圧縮命令拡張。非圧縮命令は、そのまま通過。
+  */
 class RVCExpander(implicit val p: Parameters) extends Module with HasCoreParameters {
   val io = new Bundle {
     val in = UInt(INPUT, 32)

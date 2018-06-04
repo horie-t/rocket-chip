@@ -178,8 +178,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
 
   // decode stage
   /*****************************************
-   * デコードステージ 
+   * 命令デコードステージ(Instruction Decode)
    *****************************************/
+  //// レジスタアドレス等抽出
   val ibuf = Module(new IBuf)
   val id_expanded_inst = ibuf.io.inst.map(_.bits.inst)
   val id_raw_inst = ibuf.io.inst.map(_.bits.raw)
@@ -188,21 +189,28 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   ibuf.io.kill := take_pc
 
   require(decodeWidth == 1 /* TODO */ && retireWidth == decodeWidth)
+
+  //// 命令デコード
   val id_ctrl = Wire(new IntCtrlSigs()).decode(id_inst(0), decode_table)
+
+  // レジスタアドレス
   val id_raddr3 = id_expanded_inst(0).rs3
   val id_raddr2 = id_expanded_inst(0).rs2
   val id_raddr1 = id_expanded_inst(0).rs1
   val id_waddr  = id_expanded_inst(0).rd
+
   val id_load_use = Wire(Bool())
   val id_reg_fence = Reg(init=Bool(false))
   val id_ren = IndexedSeq(id_ctrl.rxs1, id_ctrl.rxs2)
-  val id_raddr = IndexedSeq(id_raddr1, id_raddr2)
+  val id_raddr = IndexedSeq(id_raddr1, id_raddr2) // 読み出しレジスタアドレス・シーケンス
+
   // レジスタ・ファイル
   val rf = new RegFile(31, xLen)
   val id_rs = id_raddr.map(rf.read _)
   val ctrl_killd = Wire(Bool())
   val id_npc = (ibuf.io.pc.asSInt + ImmGen(IMM_UJ, id_inst(0))).asUInt
 
+  // CSRレジスタ関連
   val csr = Module(new CSRFile(perfEvents))
   val id_csr_en = id_ctrl.csr.isOneOf(CSR.S, CSR.C, CSR.W)
   val id_system_insn = id_ctrl.csr >= CSR.I
@@ -286,6 +294,8 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val ex_rs = for (i <- 0 until id_raddr.size)
     yield Mux(ex_reg_rs_bypass(i), bypass_mux(ex_reg_rs_lsb(i)), Cat(ex_reg_rs_msb(i), ex_reg_rs_lsb(i)))
   val ex_imm = ImmGen(ex_ctrl.sel_imm, ex_reg_inst)
+
+  //// ALU入力決定
   val ex_op1 = MuxLookup(ex_ctrl.sel_alu1, SInt(0), Seq(
     A1_RS1 -> ex_rs(0).asSInt,
     A1_PC -> ex_reg_pc.asSInt))

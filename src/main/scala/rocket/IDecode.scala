@@ -16,6 +16,8 @@ abstract trait DecodeConstants extends HasCoreParameters
   val table: Array[(BitPat, List[BitPat])]
 }
 
+/** 制御信号バンドル
+  */
 class IntCtrlSigs extends Bundle {
   val legal = Bool()
   val fp = Bool()
@@ -70,6 +72,14 @@ class IntCtrlSigs extends Bundle {
 class IDecode(implicit val p: Parameters) extends DecodeConstants
 {
   val table: Array[(BitPat, List[BitPat])] = Array(
+                //           jal                                                                 renf1             fence.i
+                //   val     | jalr                                                              | renf2           |
+                //   | fp_val| | renx2                                                           | | renf3         |
+                //   | | rocc| | | renx1     s_alu1                          mem_val             | | | wfd         | 
+                //   | | | br| | | | s_alu2  |       imm    dw     alu       | mem_cmd   mem_type| | | | mul       | 
+                //   | | | | | | | | |       |       |      |      |         | |           |     | | | | | div     | fence
+                //   | | | | | | | | |       |       |      |      |         | |           |     | | | | | | wxd   | | amo
+                //   | | | | | | | | |       |       |      |      |         | |           |     | | | | | | |     | | | dp
     BNE->       List(Y,N,N,Y,N,N,Y,Y,A2_RS2, A1_RS1, IMM_SB,DW_X,  FN_SNE,   N,M_X,        MT_X, N,N,N,N,N,N,N,CSR.N,N,N,N,N),
     BEQ->       List(Y,N,N,Y,N,N,Y,Y,A2_RS2, A1_RS1, IMM_SB,DW_X,  FN_SEQ,   N,M_X,        MT_X, N,N,N,N,N,N,N,CSR.N,N,N,N,N),
     BLT->       List(Y,N,N,Y,N,N,Y,Y,A2_RS2, A1_RS1, IMM_SB,DW_X,  FN_SLT,   N,M_X,        MT_X, N,N,N,N,N,N,N,CSR.N,N,N,N,N),
