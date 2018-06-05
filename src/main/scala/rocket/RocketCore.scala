@@ -190,7 +190,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
 
   require(decodeWidth == 1 /* TODO */ && retireWidth == decodeWidth)
 
-  //// 命令デコード
+  //// 命令から、制御信号を生成
   val id_ctrl = Wire(new IntCtrlSigs()).decode(id_inst(0), decode_table)
 
   // レジスタアドレス

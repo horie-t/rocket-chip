@@ -16,7 +16,7 @@ abstract trait DecodeConstants extends HasCoreParameters
   val table: Array[(BitPat, List[BitPat])]
 }
 
-/** 制御信号バンドル
+/** 内部制御信号バンドル
   */
 class IntCtrlSigs extends Bundle {
   val legal = Bool()
@@ -69,6 +69,8 @@ class IntCtrlSigs extends Bundle {
   }
 }
 
+/** 命令コード -> 内部制御信号 対応定義
+  */
 class IDecode(implicit val p: Parameters) extends DecodeConstants
 {
   val table: Array[(BitPat, List[BitPat])] = Array(
