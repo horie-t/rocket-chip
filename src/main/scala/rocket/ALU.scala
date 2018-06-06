@@ -9,22 +9,21 @@ import freechips.rocketchip.tile.CoreModule
 
 object ALU
 {
-  val SZ_ALU_FN = 4
-  def FN_X    = BitPat("b????")
-  def FN_ADD  = UInt(0)
-  def FN_SL   = UInt(1)
-  def FN_SEQ  = UInt(2)
-  def FN_SNE  = UInt(3)
-  def FN_XOR  = UInt(4)
-  def FN_SR   = UInt(5)
-  def FN_OR   = UInt(6)
-  def FN_AND  = UInt(7)
-  def FN_SUB  = UInt(10)
-  def FN_SRA  = UInt(11)
-  def FN_SLT  = UInt(12)
-  def FN_SGE  = UInt(13)
-  def FN_SLTU = UInt(14)
-  def FN_SGEU = UInt(15)
+  // ALUの演算機能コード
+  def FN_ADD  = UInt(0)  // 加算
+  def FN_SL   = UInt(1)  // 左シフト
+  def FN_SEQ  = UInt(2)  // 等号(==)判定
+  def FN_SNE  = UInt(3)  // 不等(!=)判定
+  def FN_XOR  = UInt(4)  // 排他的論理和(XOR)
+  def FN_SR   = UInt(5)  // 右論理シフト
+  def FN_OR   = UInt(6)  // 論理和(OR)
+  def FN_AND  = UInt(7)  // 論理積(AND)
+  def FN_SUB  = UInt(10) // 減算
+  def FN_SRA  = UInt(11) // 右算術シフト
+  def FN_SLT  = UInt(12) // 未満(<)判定
+  def FN_SGE  = UInt(13) // 以上(>=)判定
+  def FN_SLTU = UInt(14) // 未満(<)判定。符号なし
+  def FN_SGEU = UInt(15) // 以上(>=)判定。符号なし
 
   def FN_DIV  = FN_XOR
   def FN_DIVU = FN_SR
@@ -37,10 +36,19 @@ object ALU
   def FN_MULHU  = FN_SNE
 
   def isMulFN(fn: UInt, cmp: UInt) = fn(1,0) === cmp(1,0)
+  /** 引き算の処理が必要かどうかを返します */
   def isSub(cmd: UInt) = cmd(3)
+
+  /** 比較演算かどうか */
   def isCmp(cmd: UInt) = cmd >= FN_SLT
+
+  /** 符号なし整数の比較か */
   def cmpUnsigned(cmd: UInt) = cmd(1)
+
+  /** 比較処理の結果にNOT演算が必要かどうかを返します */
   def cmpInverted(cmd: UInt) = cmd(0)
+
+  /** 比較処理の内で、等しいまたは等しくないの演算かどうか */
   def cmpEq(cmd: UInt) = !cmd(3)
 }
 
@@ -50,12 +58,12 @@ import Instructions._
 class ALU(implicit p: Parameters) extends CoreModule()(p) {
   val io = new Bundle {
     val dw = Bits(INPUT, SZ_DW)
-    val fn = Bits(INPUT, SZ_ALU_FN)
-    val in2 = UInt(INPUT, xLen)
-    val in1 = UInt(INPUT, xLen)
-    val out = UInt(OUTPUT, xLen)
-    val adder_out = UInt(OUTPUT, xLen)
-    val cmp_out = Bool(OUTPUT)
+    val fn = Bits(INPUT, SZ_ALU_FN) // 演算の機能種類の指定
+    val in2 = UInt(INPUT, xLen)     // 被演算数1
+    val in1 = UInt(INPUT, xLen)     // 被演算数2
+    val out = UInt(OUTPUT, xLen)    // 演算結果
+    val adder_out = UInt(OUTPUT, xLen) // 加減算結果
+    val cmp_out = Bool(OUTPUT)         // 比較結果
   }
 
   // ADD, SUB
@@ -85,7 +93,7 @@ class ALU(implicit p: Parameters) extends CoreModule()(p) {
   val shout = Mux(io.fn === FN_SR || io.fn === FN_SRA, shout_r, UInt(0)) |
               Mux(io.fn === FN_SL,                     shout_l, UInt(0))
 
-  // AND, OR, XOR
+  // AND, OR, XOR(補足: A XOR B | A AND Bは、 A OR Bと同じ)
   val logic = Mux(io.fn === FN_XOR || io.fn === FN_OR, in1_xor_in2, UInt(0)) |
               Mux(io.fn === FN_OR || io.fn === FN_AND, io.in1 & io.in2, UInt(0))
   val shift_logic = (isCmp(io.fn) && slt) | logic | shout

@@ -30,24 +30,26 @@ trait ScalarOpConstants {
   def BR_LTU  = UInt(6, 3)
   def BR_GEU  = UInt(7, 3)
 
+  // ALU入力1に入力する値
   def A1_X    = BitPat("b??")
   def A1_ZERO = UInt(0, 2)
-  def A1_RS1  = UInt(1, 2)
-  def A1_PC   = UInt(2, 2)
+  def A1_RS1  = UInt(1, 2) // rs1に指定されたレジスタの値
+  def A1_PC   = UInt(2, 2) // プログラム・カウンタの値
 
   def IMM_X  = BitPat("b???")
-  def IMM_S  = UInt(0, 3)
-  def IMM_SB = UInt(1, 3)
-  def IMM_U  = UInt(2, 3)
-  def IMM_UJ = UInt(3, 3)
-  def IMM_I  = UInt(4, 3)
-  def IMM_Z  = UInt(5, 3)
+  def IMM_S  = UInt(0, 3) // S形式の即値である
+  def IMM_SB = UInt(1, 3) // B形式の即値である
+  def IMM_U  = UInt(2, 3) // U形式の即値である
+  def IMM_UJ = UInt(3, 3) // J形式の即値である
+  def IMM_I  = UInt(4, 3) // I形式の即値である
+  def IMM_Z  = UInt(5, 3) // Z形式(システム管理命令で使用)の即値である
 
+  // ALU入力2に入力する値
   def A2_X    = BitPat("b??")
   def A2_ZERO = UInt(0, 2)
-  def A2_SIZE = UInt(1, 2)
-  def A2_RS2  = UInt(2, 2)
-  def A2_IMM  = UInt(3, 2)
+  def A2_SIZE = UInt(1, 2) // 1命令のバイト数
+  def A2_RS2  = UInt(2, 2) // rs2に指定されたレジスタの値
+  def A2_IMM  = UInt(3, 2) // 命令の中の即値
 
   def X = BitPat("b?")
   def N = BitPat("b0")

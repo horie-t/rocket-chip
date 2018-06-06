@@ -124,7 +124,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val mem_ctrl = Reg(new IntCtrlSigs)
   val wb_ctrl = Reg(new IntCtrlSigs)
 
-  // 実行ステージ用レジスタ?
+  // 実行ステージ用レジスタ
   val ex_reg_xcpt_interrupt  = Reg(Bool())
   val ex_reg_valid           = Reg(Bool())
   val ex_reg_rvc             = Reg(Bool())
@@ -138,7 +138,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val ex_reg_inst = Reg(Bits())
   val ex_reg_raw_inst = Reg(UInt())
 
-  // メモリ書き込みステージ用レジスタ?
+  // メモリ書き込みステージ用レジスタ
   val mem_reg_xcpt_interrupt  = Reg(Bool())
   val mem_reg_valid           = Reg(Bool())
   val mem_reg_rvc             = Reg(Bool())
@@ -159,7 +159,7 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val mem_br_taken = Reg(Bool())
   val take_pc_mem = Wire(Bool())
 
-  // レジスタ書き戻しステージ用レジスタ?
+  // レジスタ書き戻しステージ用レジスタ
   val wb_reg_valid           = Reg(Bool())
   val wb_reg_xcpt            = Reg(Bool())
   val wb_reg_replay          = Reg(Bool())
@@ -485,9 +485,9 @@ class Rocket(implicit p: Parameters) extends CoreModule()(p)
   val ctrl_killm = killm_common || mem_xcpt || fpu_kill_mem
 
   // writeback stage
-  /*
+  /*****************************************
    * レジスタ書き戻しステージ
-   */
+   *****************************************/
   wb_reg_valid := !ctrl_killm
   wb_reg_replay := replay_mem && !take_pc_wb
   wb_reg_xcpt := mem_xcpt && !take_pc_wb
@@ -837,7 +837,13 @@ class RegFile(n: Int, w: Int, zero: Boolean = false) {
   }
 }
 
+/** 即値生成クラス
+  */
 object ImmGen {
+  /** 命令から即値を生成します。
+    * @param sel 命令形式。ScalarOpConstantsの、IMM_X形式の定数
+    * @param inst 機械語命令
+    */
   def apply(sel: UInt, inst: UInt) = {
     val sign = Mux(sel === IMM_Z, SInt(0), inst(31).asSInt)
     val b30_20 = Mux(sel === IMM_U, inst(30,20).asSInt, sign)
