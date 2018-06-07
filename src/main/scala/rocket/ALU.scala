@@ -10,6 +10,8 @@ import freechips.rocketchip.tile.CoreModule
 object ALU
 {
   // ALUの演算機能コード
+  val SZ_ALU_FN = 4
+  def FN_X    = BitPat("b????")
   def FN_ADD  = UInt(0)  // 加算
   def FN_SL   = UInt(1)  // 左シフト
   def FN_SEQ  = UInt(2)  // 等号(==)判定
