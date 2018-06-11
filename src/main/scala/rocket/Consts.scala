@@ -7,18 +7,20 @@ import freechips.rocketchip.util._
 import scala.math._
 
 trait ScalarOpConstants {
+  // メモリ・アクセスのサイズ、符号情報
   val MT_SZ = 3
   def MT_X  = BitPat("b???")
-  def MT_B  = UInt("b000")
-  def MT_H  = UInt("b001")
-  def MT_W  = UInt("b010")
-  def MT_D  = UInt("b011")
-  def MT_BU = UInt("b100")
-  def MT_HU = UInt("b101")
-  def MT_WU = UInt("b110")
+  def MT_B  = UInt("b000") // 符号ありバイト
+  def MT_H  = UInt("b001") // 符号なし2バイト
+  def MT_W  = UInt("b010") // 符号あり4バイト
+  def MT_D  = UInt("b011") // 符号あり8バイト
+  def MT_BU = UInt("b100") // 符号なしバイト
+  def MT_HU = UInt("b101") // 符号なし2バイト
+  def MT_WU = UInt("b110") // 符号なし4バイト
   def mtSize(mt: UInt) = mt(MT_SZ-2, 0)
   def mtSigned(mt: UInt) = !mt(MT_SZ-1)
 
+  // 
   val SZ_BR = 3
   def BR_X    = BitPat("b???")
   def BR_EQ   = UInt(0, 3)
@@ -52,8 +54,8 @@ trait ScalarOpConstants {
   def A2_IMM  = UInt(3, 2) // 命令の中の即値
 
   def X = BitPat("b?")
-  def N = BitPat("b0")
-  def Y = BitPat("b1")
+  def N = BitPat("b0") // Noのビット・パターン
+  def Y = BitPat("b1") // Yesのビット・パターン
 
   val SZ_DW = 1
   def DW_X  = X
@@ -62,6 +64,8 @@ trait ScalarOpConstants {
   def DW_XPR = DW_64
 }
 
+/** メモリ操作用定数クラス
+  */
 trait MemoryOpConstants {
   val NUM_XA_OPS = 9
   val M_SZ      = 5
