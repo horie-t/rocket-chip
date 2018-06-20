@@ -97,19 +97,16 @@ riscvツールのバージョンが変わったら、[riscv-tools/README](https:
     $ ./build.sh
     $ ./build-rv32ima.sh # (32ビット版RISC-Vを使う場合のみ)
 
-## <a name="what"></a> What's in the Rocket chip generator repository?
+## <a name="what"></a> Rocket chip generatorの内容は?
 
-The rocket-chip repository is a meta-repository that points to several
-sub-repositories using [Git submodules](http://git-scm.com/book/en/Git-Tools-Submodules).
-Those repositories contain tools needed to generate and test SoC designs.
-This respository also contains code that is used to generate RTL.
-Hardware generation is done using [Chisel](http://chisel.eecs.berkeley.edu),
-a hardware construction language embedded in Scala.
-The rocket-chip generator is a Scala program that invokes the Chisel compiler
-in order to emit RTL describing a complete SoC.
-The following sections describe the components of this repository.
+このrocket-chipリポジトリは、いつくかのサブ・リポジトリを指しているメタ・リポジトリです。サブ・リポジトリには、[Git submodules](http://git-scm.com/book/en/Git-Tools-Submodules) を使用しています。
+これらのリポジトリは、SoCの設計を生成し、テストするツールが含まれます。
+このリポジトリも、RTLを生成するために使うコードを含みます。
+ハードウェアの生成は、[Chisel](http://chisel.eecs.berkeley.edu) を使って行われます。Chiselは、Scalaに埋め込むハードウェア構築言語(hardware construction language)です。(訳注: ハードウェア記述言語、hardware description language、HDLではありません)
+rocket-chip generatorは、Scalaのプログラムで、Chiselコンパイラを起動して、完全なSoCを記述したRTLを出力します。
+次の節からは、このリポジトリの内容を解説します。
 
-### <a name="what_submodules"></a>Git Submodules
+### <a name="what_submodules"></a>Gitのサブモジュール
 
 [Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) allow you to keep a Git repository as a subdirectory of another Git repository.
 For projects being co-developed with the Rocket Chip Generator, we have often found it expedient to track them as submodules,
@@ -140,14 +137,12 @@ We tag a version of the RISC-V software ecosystem that works with the RTL commit
 This module is used to generate and execute constrained random instruction streams that can
 be used to stress-test both the core and uncore portions of the design.
 
-### <a name="what_packages"></a>Scala Packages
+### <a name="what_packages"></a>Scalaパッケージ
 
-In addition to submodules that track independent Git repositories,
-the rocket-chip code base is itself factored into a number of Scala packages.
-These packages are all found within the src/main/scala directory.
-Some of these packages provide Scala utilities for generator configuration,
-while other contain the actual Chisel RTL generators themselves.
-Here is a brief description of what can be found in each package:
+独立したGitリポジトリに追随するサブモジュールに加えて、rocket-chipのコードは、いくつかのScalaパッケージとして分割できます。
+これらのパッケージは、 src/main/scala ディレクトリで見つかります。
+これらのパッケージのいくつかは、ジェネレータの構成のためのScalaユーティリティを提供し、その他が、実際のChiselのRTL ジェネレータ自身です。
+ここに、各パッケージの手短な説明を挙げます:
 
 * **amba**
 This RTL package uses diplomacy to generate bus implementations of AMBA protocols, including AXI4, AHB-lite, and APB.
