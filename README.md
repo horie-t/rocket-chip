@@ -1,7 +1,8 @@
 Rocket Chip Generator 解説
 =====================
 
-このリポジトリは、「[Rocket Chip Generator](https://github.com/freechipsproject/rocket-chip)」のコードを解説するためにフォークしたものです。解説は、[Wikiページ](./wiki)を参照してください。他に、英語のRocket Chipの資料は、[technical report](http://www.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-17.html)にあります。
+このリポジトリは、「[Rocket Chip Generator](https://github.com/freechipsproject/rocket-chip)」のコードを解説するため、及びコードに詳細なコメントを追加するためにフォークしたものです。解説は、[Wikiページ](./wiki)を参照してください。コードのコメントの追加状況は[コミットログ](https://github.com/horie-t/rocket-chip/commits/master)を参照してください。
+他に、英語のRocket Chipの資料は、[technical report](http://www.eecs.berkeley.edu/Pubs/TechRpts/2016/EECS-2016-17.html)にあります。
 
 ## 目次
 
@@ -145,44 +146,34 @@ be used to stress-test both the core and uncore portions of the design.
 ここに、各パッケージの手短な説明を挙げます:
 
 * **amba**
-This RTL package uses diplomacy to generate bus implementations of AMBA protocols, including AXI4, AHB-lite, and APB.
+このRTLパッケージは、AMBAプロトコル(AXI4、AHB-liteとAPBを含む)のバスの実装を生成するのに使います。
 * **config**
-This utility package provides Scala interfaces for configuring a generator via a dynamically-scoped
-parameterization library.
+このユーティリティ・パッケージは、ジェネレータを構築するためのScalaのインターフェイスを提供します。インターフェイスは、動的スコープのパラメータ・ライブラリを通して提供されます。
 * **coreplex**
-This RTL package generates a complete coreplex by gluing together a variety of components from other packages,
-including: tiled Rocket cores, a system bus network, coherence agents, debug devices, interrupt handlers, externally-facing peripherals,
-clock-crossers and converters from TileLink to external bus protocols (e.g. AXI or AHB).
+このRTLパッケージは、他パッケージからの様々なコンポーネントを結びつけて、完全なコア構造体(coreplex)を生成します。コンポーネントに含まれるのは、タイル状に並べられた、Rocketコア、システム・バス・ネットワーク、データ一貫性エージェント(coherence agents)、デバッグ用デバイス、割り込みハンドラ、外部向けの周辺部、クロック間接続(clock-crossers)、TileLinkから外部バスプロトコル(例えば、AXIもしくはAHB)への変換器です。
 * **devices**
-This RTL package contains implementations for peripheral devices, including the Debug module and various TL slaves.
+このRTLパッケージは、周辺機器の実装を含みます。これらにはデバッグ用モジュールと様々なTileLinkのスレーブが含まれます。
 * **diplomacy**
-This utility package extends Chisel by allowing for two-phase hardware elaboration, in which certain parameters
-are dynamically negotiated between modules. For more information about diplomacy, see [this paper](https://carrv.github.io/papers/cook-diplomacy-carrv2017.pdf).
+このユーティリティ・パッケージは、2つのフェーズによるハードウェアのelaborationを許可する事によってChiselを拡張します。(This utility package extends Chisel by allowing for two-phase hardware elaboration) 拡張には、いくつかのパラメータが動的にモジュール間を調整する事が含まれます。 diplomacyの詳細は、[この論文](https://carrv.github.io/papers/cook-diplomacy-carrv2017.pdf) を参照の事。
 * **groundtest**
-This RTL package generates synthesizable hardware testers that emit randomized
-memory access streams in order to stress-tests the uncore memory hierarchy.
+このRTLパッケージは、合成可能なハードウェア・テスターを生成します。このテスターは、ランダム化したメモリアクセスのストリームを発行する事によって、コア外のメモリ階層のストレステストを実行します。
 * **jtag**
-This RTL package provides definitions for generating JTAG bus interfaces.
+このRTLパッケージは、JTAGバス・インターフェイスの定義を提供します。
 * **regmapper**
-This utility package generates slave devices with a standardized interface for accessing their memory-mapped registers.
+このユーティリティ・パッケージは、メモリマップド・レジスタにアクセスするための標準的なスレーブ・デバイスを生成します。
 * **rocket**
-This RTL package generates the Rocket in-order pipelined core,
-as well as the L1 instruction and data caches.
-This library is intended to be used by a chip generator that instantiates the
-core within a memory system and connects it to the outside world.
+このRTLパッケージは、Rocketイン・オーダー・パイプライン・コアを生成し、L1命令、データキャッシュも生成します。
+このライブラリは、chip generatorから使われる事を意図し、コアをメモリシステムの中でインスタンス化し、外界へ接続される事を意図しています。
 * **tile**
-This RTL package contains components that can be combined with cores to construct tiles, such as FPUs and accelerators.
+このRTLパッケージは、コアと組み合わせてtileを構築するコンポーネント、例えばFPUやアクセラレータを含みます。
 * **tilelink**
-This RTL package uses diplomacy to generate bus implementations of the TileLink protocol. It also contains a variety
-of adapters and protocol converters.
+このRTLパッケージは、TileLinkプロトコルのバスの実装を生成する手順を使用します。また、様々なアダプタとプロトコル変換器を含みます。
 * **system**
-This top-level utility package invokes Chisel to elaborate a particular configuration of a coreplex,
-along with the appropriate testing collateral.
+このトップ・レベルのユーティリティ・パッケージは、Chiselを起動して、特定のcoreplexの構成をelaborateします。同時に、適切なテスト用副生成物もelaborateします。
 * **unittest**
-This utility package contains a framework for generateing synthesizable hardware testers of individual modules.
+このユーティリティ・パッケージは、個別モジュールの合成可能なハードウェア・テスターを生成するためのフレームワークを含みます。
 * **util**
-This utility package provides a variety of common Scala and Chisel constructs that are re-used across
-multiple other packages,
+このユーティリティ・パッケージは、様々な共通のScalaとChiselのコンストラクタを含みます。このコンストラクタは、複数の他パッケージに渡って再利用されます。
 
 ### <a name="what_else"></a>Other Resources
 
