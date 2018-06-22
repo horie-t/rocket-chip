@@ -200,7 +200,7 @@ Synopsys VCSシミュレーションがコンパイル、実行されるディ�
 
 ### <a name="what_toplevel"></a>トップ・レベルの設計の拡張
 
-[ここの説明](https://github.com/ucb-bar/project-template) で、あなた独自設計のカスタム・デバイスをどのように作るかを見てください。
+[ここの説明](https://github.com/horie-t/project-template) で、あなた独自設計のカスタム・デバイスをどのように作ればよいかを見てください。
 
 ## <a name="how"></a> How should I use the Rocket chip generator?
 
