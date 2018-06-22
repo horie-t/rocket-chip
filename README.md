@@ -149,14 +149,13 @@ be used to stress-test both the core and uncore portions of the design.
 このRTLパッケージは、AMBAプロトコル(AXI4、AHB-liteとAPBを含む)のバスの実装を生成するのに使います。
 * **config**
 このユーティリティ・パッケージは、ジェネレータを構築するためのScalaのインターフェイスを提供します。インターフェイスは、動的スコープのパラメータ・ライブラリを通して提供されます。
-* **coreplex**
-このRTLパッケージは、他パッケージからの様々なコンポーネントを結びつけて、完全なコア構造体(coreplex)を生成します。コンポーネントに含まれるのは、タイル状に並べられた、Rocketコア、システム・バス・ネットワーク、データ一貫性エージェント(coherence agents)、デバッグ用デバイス、割り込みハンドラ、外部向けの周辺部、クロック間接続(clock-crossers)、TileLinkから外部バスプロトコル(例えば、AXIもしくはAHB)への変換器です。
 * **devices**
 このRTLパッケージは、周辺機器の実装を含みます。これらにはデバッグ用モジュールと様々なTileLinkのスレーブが含まれます。
 * **diplomacy**
 このユーティリティ・パッケージは、2つのフェーズによるハードウェアのelaborationを許可する事によってChiselを拡張します。(This utility package extends Chisel by allowing for two-phase hardware elaboration) 拡張には、いくつかのパラメータが動的にモジュール間を調整する事が含まれます。 diplomacyの詳細は、[この論文](https://carrv.github.io/papers/cook-diplomacy-carrv2017.pdf) を参照の事。
 * **groundtest**
 このRTLパッケージは、合成可能なハードウェア・テスターを生成します。このテスターは、ランダム化したメモリアクセスのストリームを発行する事によって、コア外のメモリ階層のストレステストを実行します。
+* **interrupts**
 * **jtag**
 このRTLパッケージは、JTAGバス・インターフェイスの定義を提供します。
 * **regmapper**
@@ -164,12 +163,14 @@ be used to stress-test both the core and uncore portions of the design.
 * **rocket**
 このRTLパッケージは、Rocketイン・オーダー・パイプライン・コアを生成し、L1命令、データキャッシュも生成します。
 このライブラリは、chip generatorから使われる事を意図し、コアをメモリシステムの中でインスタンス化し、外界へ接続される事を意図しています。
+* **subsystem**
+このRTLパッケージは、他パッケージからの様々なコンポーネントを結びつけて、完全なコア構造体(coreplex)を生成します。コンポーネントに含まれるのは、タイル状に並べられた、Rocketコア、システム・バス・ネットワーク、データ一貫性エージェント(coherence agents)、デバッグ用デバイス、割り込みハンドラ、外部向けの周辺部、クロック間接続(clock-crossers)、TileLinkから外部バスプロトコル(例えば、AXIもしくはAHB)への変換器です。
+* **system**
+このトップ・レベルのユーティリティ・パッケージは、Chiselを起動して、特定のcoreplexの構成をelaborateします。同時に、適切なテスト用副生成物もelaborateします。
 * **tile**
 このRTLパッケージは、コアと組み合わせてtileを構築するコンポーネント、例えばFPUやアクセラレータを含みます。
 * **tilelink**
 このRTLパッケージは、TileLinkプロトコルのバスの実装を生成する手順を使用します。また、様々なアダプタとプロトコル変換器を含みます。
-* **system**
-このトップ・レベルのユーティリティ・パッケージは、Chiselを起動して、特定のcoreplexの構成をelaborateします。同時に、適切なテスト用副生成物もelaborateします。
 * **unittest**
 このユーティリティ・パッケージは、個別モジュールの合成可能なハードウェア・テスターを生成するためのフレームワークを含みます。
 * **util**
