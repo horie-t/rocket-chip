@@ -7,7 +7,7 @@ Rocket Chip Generator 解説
 ## 目次
 
 + [手早く始める](#quick) 早いところ詳細にまで飛び込んでしまいたい人向け。このリポジトリの正確な内容は後回しにして。
-+ [What's in the Rocket chip generator repository?](#what)
++ [Rocket chip generatorの内容は?](#what)
 + [How should I use the Rocket chip generator?](#how)
     + [Using the cycle-accurate Verilator simulation](#emulator)
     + [Mapping a Rocket core down to an FPGA](#fpga)
@@ -175,33 +175,31 @@ be used to stress-test both the core and uncore portions of the design.
 * **util**
 このユーティリティ・パッケージは、様々な共通のScalaとChiselのコンストラクタを含みます。このコンストラクタは、複数の他パッケージに渡って再利用されます。
 
-### <a name="what_else"></a>Other Resources
+### <a name="what_else"></a>他リソース
 
-Outside of Scala, we also provide a variety of resources to create a complete SoC implementation and
-test the generated designs.
+Scalaの外部では、完全なSocの実装を生成するための様々なリソースと、生成した設計のテストを提供します。
 
 * **bootrom**
-Sources for the first-stage bootloader included in the BootROM.
+BootROMに含まれる、第一段階のブートローダのためのソース。
 * **csrc**
-C sources for use with Verilator simulation.
+Verilatorシミュレーションで使用するためのCソース
 * **emulator**
-Directory in which Verilator simulations are compiled and run.
+Verilatorシミュレーションがコンパイル、実行されるディレクトリ。
 * **project**
-Directory used by SBT for Scala compilation and build.
+Scalaのコンパイル、ビルドのためのSBTによって使われるディレクトリ。
 * **regression**
-Defines continuous integration and nightly regression suites.
+継続的インテグレーションと、ナイトリー・リグレッションを定義する。
 * **scripts**
-Utilities for parsing the output of simulations or manipulating the contents of source files.
+シミュレーションの出力の解析、もしくはソース・ファイルの内容を扱うユーティリティ。
 * **vsim**
-Directory in which Synopsys VCS simulations are compiled and run.
+Synopsys VCSシミュレーションがコンパイル、実行されるディレクトリ。
 * **vsrc**
-Verilog sources containing interfaces, harnesses and VPI.
+インターフェイス、ハーネスとVPIを含むVerilogソース。
 
 
-### <a name="what_toplevel"></a>Extending the Top-Level Design
+### <a name="what_toplevel"></a>トップ・レベルの設計の拡張
 
-See [this description](https://github.com/ucb-bar/project-template) of how to create
-you own top-level design with custom devices.
+[ここの説明](https://github.com/ucb-bar/project-template) で、あなた独自設計のカスタム・デバイスをどのように作るかを見てください。
 
 ## <a name="how"></a> How should I use the Rocket chip generator?
 
