@@ -109,34 +109,28 @@ rocket-chip generatorは、Scalaのプログラムで、Chiselコンパイラを
 
 ### <a name="what_submodules"></a>Gitのサブモジュール
 
-[Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) allow you to keep a Git repository as a subdirectory of another Git repository.
-For projects being co-developed with the Rocket Chip Generator, we have often found it expedient to track them as submodules,
-allowing for rapid exploitation of new features while keeping commit histories separate.
-As submoduled projects adopt stable public APIs, we transition them to external dependencies.
-Here are the submodules that are currently being tracked in the rocket-chip repository:
+[Gitサブモジュール](https://git-scm.com/book/en/v2/Git-Tools-Submodules) は、別のGitリポジトリをサブ・ディレクトリとして扱う事を可能にしてくれます。
+Rocket Chip Generatorと共同開発されているプロジェクトにとっては、コミット履歴を分離して、新しい機能を迅速に開発できるようになり、我々としても、サブモジュールとして追随する事は大変都合がよい事がわかった。
+サブモジュールのプロジェクトが、安定版の公開APIとして採択していても、我々はそのAPIを試験的な依存として移行できる。
+ここに、rocket-chipリポジトリが現在追随しているサブモジュールを記載する:
 
 * **chisel3**
 ([https://github.com/ucb-bar/chisel3](https://github.com/ucb-bar/chisel3)):
-The Rocket Chip Generator uses [Chisel](http://chisel.eecs.berkeley.edu) to generate RTL.
+Rocket Chip Generator は [Chisel](http://chisel.eecs.berkeley.edu) をRTL生成用に使用しています。
 * **firrtl**
 ([https://github.com/ucb-bar/firrtl](https://github.com/ucb-bar/firrtl)):
 [Firrtl (Flexible Internal Representation for RTL)](http://bar.eecs.berkeley.edu/projects/2015-firrtl.html)
-is the intermediate representation of RTL constructions used by Chisel3.
-The Chisel3 compiler generates a Firrtl representation,
-from which the final product (Verilog code, C code, etc) is generated.
+は、Chisel3で使用されている、RTL構築の中間表現です。
+Chisel3コンパイラは、Firrtl表現(representation)を生成し、その表現から最終成果物(Verilog コード、C コード等)が生成されます。
 * **hardfloat**
 ([https://github.com/ucb-bar/berkeley-hardfloat](https://github.com/ucb-bar/berkeley-hardfloat)):
-Hardfloat holds Chisel code that generates parameterized IEEE 754-2008 compliant
-floating-point units used for fused multiply-add operations, conversions
-between integer and floating-point numbers, and conversions between
-floating-point conversions with different precision.
+Hardfloat は、Chiselコードで、パラメータ化されたIEEE 754-2008準拠の浮動小数点演算器を生成します。この演算器は、積和演算、整数と浮動小数点との変換、および浮動小数点を別の精度のものに変換する機能も結合されています。
 * **riscv-tools**
 ([https://github.com/riscv/riscv-tools](https://github.com/riscv/riscv-tools)):
-We tag a version of the RISC-V software ecosystem that works with the RTL committed in this repository.
+このリポジトリにコミットされているRTLで動作する、RISC-Vソフトウェアのエコシステムをタグ付けしています。
 * **torture**
 ([https://github.com/ucb-bar/riscv-torture](https://github.com/ucb-bar/riscv-torture)):
-This module is used to generate and execute constrained random instruction streams that can
-be used to stress-test both the core and uncore portions of the design.
+このモジュールは、無作為の命令列を生成し実行させる事により、コアおよびコア外の部分の設計に対して、ストレステストが出来るようにします。
 
 ### <a name="what_packages"></a>Scalaパッケージ
 
